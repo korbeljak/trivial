@@ -62,5 +62,23 @@ class Entity
             throw new \InvalidArgumentException("Null pointer in column.");
         }
     }
+    
+    public function __get(string $name)
+    {
+        if (array_key_exists($name, $this->attr))
+        {
+            return $this->attr[$name]->GetValue();
+        }
+
+        return null;
+    }
+    
+    public function __set(string $name, mixed $value)
+    {
+        if (array_key_exists($name, $this->attr))
+        {
+            $this->attr[$name]->SetValue($value);
+        }
+    }
 }
 
