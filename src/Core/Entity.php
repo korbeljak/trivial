@@ -68,11 +68,11 @@ class Entity
             return "";
         }
         
-        $formHtml = ILVL[$lvl].'<form action="" method="post">\n';
+        $formHtml = ILVL[$lvl]."<form action=\"\" method=\"post\">\n";
         
         foreach($this->attr as $name => $attr)
         {
-            $formHtml .= ILVL[$lvl+1].$attr->GetHtmlFormElem()."\n";
+            $formHtml .= ILVL[$lvl+1].$attr->GetHtmlFormElem($this->name)."\n";
         }
         
         $formHtml .= ILVL[$lvl]."</form>";
@@ -163,6 +163,11 @@ class Entity
         
     }
     
+    public function GetState()
+    {
+        return $this->state;
+    }
+    
     
     /**
      * Adds an attribute to the Entity.
@@ -176,9 +181,9 @@ class Entity
     {
         if ($attr != null)
         {
-            $this->column[] = $attr;
+            $this->attr[$attr->GetName()] = $attr;
             
-            $this->state = TRANSITION_TABLE[$this->state + 3 * $attr->GetState()];
+            $this->state = self::TRANSITION_TABLE[$this->state + 3 * $attr->GetState()];
             
         }
         else
@@ -218,6 +223,8 @@ class Entity
      */
     public function __set(string $name, $value)
     {
+        var_dump($name);
+        
         if (array_key_exists($name, $this->attr))
         {
             $this->attr[$name]->SetValue($value);
