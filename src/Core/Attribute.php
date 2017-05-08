@@ -17,6 +17,9 @@ interface Attribute
     /** Valid attribute state (validation run: succeeded). */
     const STATE_VALID = 2;
     
+    /** Counting state. This has to be the last item value + 1. */
+    const STATE_CNT = 3;
+    
     /**
      * Gets A HTML form element of the attribute with the ability to inject
      * a form name prefix.
@@ -35,10 +38,8 @@ interface Attribute
     
     /**
      * Validates an attribute value according to attribute constraints.
-     * 
-     * @param mixed $value Any value relevant to an attribute.
      */
-    public function Validate(mixed $value);
+    public function Validate();
     
     /**
      * true if the attribute is required, false otherwise.
@@ -75,6 +76,6 @@ interface Attribute
      * Sets attribute value.
      * @param mixed $value
      */
-    public function SetValue(mixed $value);
+    public function SetValue($value);
 
 }

@@ -51,8 +51,8 @@ class PlainString implements \Core\Attribute
                                 string $hint,
                                 string $description,
                                 string $default = "",
-                                int $max = 255,
                                 int $min = 0,
+                                int $max = 255,
                                 string $regexp = "")
     {
         if (empty($name))
