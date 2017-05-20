@@ -1,6 +1,7 @@
 <?php
 use Core\Router;
 
+$GLOBALS["CORE_PATH"] = __DIR__;
 
 // function say_hi($args)
 // {
@@ -36,7 +37,8 @@ const ILVL = array("",                      //  0
 
 // \Core\Router::GetDefaultRouter()->AddRule("/(?P<name>ahoj)\/(?P<whom>.+)\//", 'say_hi');
 // \Core\Router::GetDefaultRouter()->AddRule("/(?P<name>ahoj)\/(?P<whom>.+)\//", 'say_hello');
-\Core\Router::GetDefaultRouter()->Route("");
+\Core\Router::GetDefaultRouter()->AddRule("/coreassets\/(?P<assetPath>.+)/", '\Core\Asset::GetAsset');
+\Core\Router::GetDefaultRouter()->Route($_GET["pg"]);
 
 
 

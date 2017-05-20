@@ -105,10 +105,21 @@ class Page
 
     public function GetAsset(string $path)
     {
-        $assetPath = "assets".DS.$path;
+        $assetPath = "assets/".$path;
         if (!file_exists($assetPath))
         {
-            $assetPath = "assets".DS."notfound.".$this->GetNotFoundFormat($path);
+            // Try core assets instead.
+            $corePath = $GLOBALS["CORE_PATH"].DS."coreassets".DS.$path;
+            
+            if (file_exists($corePath))
+            {
+                $assetPath = "coreassets/".$path;
+            }
+            else
+            {
+                // Not found anywhere.
+                $assetPath = "assets".DS."notfound.".$this->GetNotFoundFormat($path);
+            }
         }
         
         return $assetPath;

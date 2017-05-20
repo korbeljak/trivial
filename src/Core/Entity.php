@@ -93,14 +93,19 @@ class Entity
             return "";
         }
         
-        $jsonScript = ILVL[$lvl].'<script type="text/js">\n';
+        $jsonScript = ILVL[$lvl].'<script type="text/js">'."\n";
         
+        $jsonScript .= ILVL[$lvl+1].'if (typeof x === "undefined")'."\n";
+        $jsonScript .= ILVL[$lvl+1].'{'."\n";
+        $jsonScript .= ILVL[$lvl+2].'window.validationRules = new Array();'."\n";
+        $jsonScript .= ILVL[$lvl+1].'}'."\n";
+
         foreach($this->attr as $name => $attr)
         {
-            $formHtml .= ILVL[$lvl+1].$attr->GetJsonValidationParams($this->name)."\n";
+            $jsonScript .= ILVL[$lvl+1]."window.validationRules.push(".$attr->GetJsonValidationParams($this->name).");\n";
         }
         
-        $jsonScript .= ILVL[$lvl].'</script>\n';
+        $jsonScript .= ILVL[$lvl].'</script>'."\n";
         
         return $jsonScript;
     }

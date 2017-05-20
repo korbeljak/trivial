@@ -126,14 +126,17 @@ class PlainString implements \Core\Attribute
      */
     public function GetJsonValidationParams(string $formName)
     {
+        $func = (new \ReflectionClass($this))->getShortName();
+        
         $jsonArray = array(
+            "validatorFunc" => $func,
+            "args" => array(
                 "id" => $formName . "_" . $this->name,
                 "required" => $this->required,
-                "type" => (new \ReflectionClass($this))->getShortName(),
+                "hint" => $this->hint,
                 "min" => $this->min,
                 "max" => $this->max,
-                "regexp" => $this->regexp
-        );
+                "regexp" => $this->regexp));
 
         return json_encode($jsonArray, JSON_PRETTY_PRINT);
     }
