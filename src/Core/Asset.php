@@ -12,7 +12,7 @@ class Asset
             
             if (strpos($path, "../") === false && substr($path, -3) === ".js")
             {
-                $fullPath = $GLOBALS["CORE_PATH"]."/coreassets/".$path;
+                $fullPath = CORE_PATH."/coreassets/".$path;
                 if (file_exists($fullPath))
                 {
                     $modDateTime = gmdate("D, d M Y H:i:s", filemtime($fullPath));

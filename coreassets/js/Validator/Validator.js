@@ -12,12 +12,15 @@
  */
 function Validator_Validate(validationRules)
 {
-    if (is_array(validationRules))
+    if (validationRules instanceof Array)
     {
         var overallOk = true;
         
-        for (rule in validationRules)
+        for (i in validationRules)
         {
+            var rule = validationRules[i];
+            
+            // Launch the validation function.
             var ok = window["Validator_"+rule.validatorFunc](rule.args);
             if (!ok)
             {

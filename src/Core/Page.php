@@ -77,6 +77,17 @@ class Page
         include $this->themePath.DS.$this->templatePath.".php";
     }
     
+    public function RenderMainScriptArea()
+    {
+        echo "";
+        /*
+        $mainScArea  = "<script type=\"text/javascript\">\n";
+        $mainScArea  .= ILVL[1]."window.validationRules = new Array();";
+        $mainScArea .= "</script>\n";
+        
+        echo $mainScArea;*/
+    }
+    
     private function GetNotFoundFormat($path)
     {
         // Get the extension.
@@ -109,7 +120,7 @@ class Page
         if (!file_exists($assetPath))
         {
             // Try core assets instead.
-            $corePath = $GLOBALS["CORE_PATH"].DS."coreassets".DS.$path;
+            $corePath = CORE_PATH.DS."coreassets".DS.$path;
             
             if (file_exists($corePath))
             {

@@ -21,7 +21,7 @@ function Validator_PlainString(args)
     
     var len = value.length;
     
-    if (len == 0 && args.required)
+    if (len == 0 && !args.required)
     {
         return true;
     }

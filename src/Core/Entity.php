@@ -93,7 +93,7 @@ class Entity
             return "";
         }
         
-        $jsonScript = ILVL[$lvl].'<script type="text/js">'."\n";
+        $jsonScript = ILVL[$lvl].'<script type="text/javascript">'."\n";
         
         $jsonScript .= ILVL[$lvl+1].'if (typeof x === "undefined")'."\n";
         $jsonScript .= ILVL[$lvl+1].'{'."\n";

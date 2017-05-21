@@ -1,7 +1,7 @@
 <?php
 use Core\Router;
 
-$GLOBALS["CORE_PATH"] = __DIR__;
+const CORE_PATH =__DIR__;
 
 // function say_hi($args)
 // {
