@@ -21,11 +21,7 @@ function Validator_Validate(validationRules)
             var rule = validationRules[i];
             
             // Launch the validation function.
-            var ok = window["Validator_"+rule.validatorFunc](rule.args);
-            if (!ok)
-            {
-                overallOk = false;
-            }
+            new window["Validator"+rule.validatorFunc](rule.args);
         }
     }
 }

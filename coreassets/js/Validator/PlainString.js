@@ -10,25 +10,43 @@
  *  - regexp Reqular expression to validate against.
  * @returns
  */
-function Validator_PlainString(args)
+ValidatorPlainString = function (args)
 {
-    // Get the item.
-    var inputText = document.getElementById(args.id);
-    var inputLabel = document.getElementById("label_"+args.id);
+    // Copy arguments.
+    this.inputId = args.id;
+    this.labelId = "label_"+args.id;
+    this.required = args.required;
+    this.min = args.min;
+    this.max = args.max;
+    this.regexp = Utils.StrToRegexp(args.regexp);
     
+    // Find DOM elements.
+    this.inputText = document.getElementById(this.inputId);
+    this.inputLabel = document.getElementById(this.labelId);
+    
+    var self = this;
+    // Register callbacks for change events.
+    
+    Utils.AddEvent(this.inputText, "blur", function() {
+        self.Validate(this); 
+    });
+    
+}
+
+ValidatorPlainString.prototype.Validate = function()
+{
     // Get the value.
-    var value = inputText.value;
-    
+    var value = this.inputText.value;
     var len = value.length;
     
-    if (len == 0 && !args.required)
+    if (len == 0 && !this.required)
     {
         return true;
     }
     
-    if (len >= args.min && len <= args.max)
+    if (len >= this.min && len <= this.max)
     {
-        if (args.regexp.exec(value))
+        if (this.regexp.exec(value))
         {
             return true;
         }
