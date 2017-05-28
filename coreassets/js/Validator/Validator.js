@@ -12,16 +12,35 @@
  */
 function Validator_Validate(validationRules)
 {
-    if (validationRules instanceof Array)
+    try
     {
-        var overallOk = true;
-        
-        for (i in validationRules)
+        if (validationRules instanceof Array)
         {
-            var rule = validationRules[i];
-            
-            // Launch the validation function.
-            new window["Validator"+rule.validatorFunc](rule.args);
+            var overallOk = true;
+
+            for (i in validationRules)
+            {
+                var rule = validationRules[i];
+
+                // Launch the validation function.
+                new window["Validator"+rule.validatorFunc](rule.args);
+            }
         }
+    }
+    catch (ex)
+    {
+        // TODO: Solve assertions via ajax & logging.
+        if (ex.description)
+        {
+            alert(ex.description);
+        }
+        else
+        {
+            alert(ex.stack);
+        }
+    }
+    finally
+    {
+        
     }
 }

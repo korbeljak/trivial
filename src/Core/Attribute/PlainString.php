@@ -102,8 +102,9 @@ class PlainString implements \Core\Attribute
      */
     public function GetHtmlFormElem(string $formName)
     {
-        $fullName = $formName . "_" . $this->name;
-        $form = "<input type=\"text\" name=\"$fullName\" id=\"$fullName\">";
+        $fullId = $formName . "_" . $this->name;
+        $fullName = $formName."[$this->name]";
+        $form = "<input type=\"text\" name=\"$fullName\" id=\"$fullId\">";
         return $form;
     }
 

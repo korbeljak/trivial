@@ -2,7 +2,7 @@
 
 /// @file install.php
 ///
-/// Installs the SVJ Core components for a given location.
+/// Installs the Trivial Core components for a given location.
 ///
 ///
 

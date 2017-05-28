@@ -68,11 +68,13 @@ class Entity
             return "";
         }
         
-        $formHtml = ILVL[$lvl]."<form action=\"\" method=\"post\">\n";
+        $formHtml = ILVL[$lvl]."<form name=\"form_".$this->name
+                    ."\" id=\"form_".$this->name
+                    ."\" action=\"\" method=\"post\">\n";
         
         foreach($this->attr as $name => $attr)
         {
-            $formHtml .= ILVL[$lvl+1].$attr->GetHtmlFormElem($this->name)."\n";
+            $formHtml .= ILVL[$lvl+1].$attr->GetHtmlFormElem("form_".$this->name)."\n";
         }
         
         $formHtml .= ILVL[$lvl]."</form>";
@@ -102,7 +104,7 @@ class Entity
 
         foreach($this->attr as $name => $attr)
         {
-            $jsonScript .= ILVL[$lvl+1]."window.validationRules.push(".$attr->GetJsonValidationParams($this->name).");\n";
+            $jsonScript .= ILVL[$lvl+1]."window.validationRules.push(".$attr->GetJsonValidationParams("form_".$this->name).");\n";
         }
         
         $jsonScript .= ILVL[$lvl].'</script>'."\n";

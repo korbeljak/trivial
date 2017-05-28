@@ -18,19 +18,42 @@ ValidatorPlainString = function (args)
     this.required = args.required;
     this.min = args.min;
     this.max = args.max;
-    this.regexp = Utils.StrToRegexp(args.regexp);
+    this.regexp = Utils.StrToRegExp(args.regexp);
     
     // Find DOM elements.
     this.inputText = document.getElementById(this.inputId);
     this.inputLabel = document.getElementById(this.labelId);
     
-    var self = this;
+    if (this.inputText.form)
+    {
+        this.parentForm = this.inputText.form;
+    }
+    else
+    {
+        this.parentForm = null;
+    }
+    
     // Register callbacks for change events.
+    var self = this;
     
     Utils.AddEvent(this.inputText, "blur", function() {
         self.Validate(this); 
     });
     
+    // If parent form exists, register the validation handler to it.
+    if (this.parentForm)
+    {
+        if (!this.parentForm._3V_Validation)
+        {
+            this.parentForm._3V_Validation = new Array();
+        }
+    
+        this.parentForm._3V_Validation.push(this);
+    }
+    else
+    {
+        throw new Error("Non-existent parent form.");
+    }
 }
 
 ValidatorPlainString.prototype.Validate = function()
