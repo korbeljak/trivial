@@ -56,6 +56,12 @@ ValidatorPlainString = function (args)
     }
 }
 
+/**
+ * Validates String Fields.
+ * 
+ * @retval true String is Valid.
+ * @retval false String in Invalid.
+ */
 ValidatorPlainString.prototype.Validate = function()
 {
     // Get the value.

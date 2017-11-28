@@ -8,8 +8,14 @@ class Page
     /** Page Heading. */
     protected $heading;
     
-    /** Page Description. */
-    protected $description;
+    /** Page Description in the heading. */
+    protected $headerDescription;
+    
+    /** Page Description in the content. */
+    protected $contentDescription;
+    
+    /** Page Content. */
+    protected $content;
     
     /** Page's Keywords. */
     protected $keywords;
@@ -46,20 +52,26 @@ class Page
      * Constructor. Any page needs title, description and keywords.
      * 
      * @param string $title Page Title.
-     * @param string $description Page Description.
+     * @param string $headerDescription Page Description for the header.
      * @param array $keywords Page's Keywords.
      * @param string $themePath Page Theme.
+     * @param string $content Page content.
+     * @param string $contentDescription Page description beneath the content.
      * @param string $templatePath Page Theme's template path.
      */
     public function __construct(string $title,
-                                string $description,
+                                string $headerDescription,
                                 array $keywords,
                                 string $templatePath,
+                                string $content = null,
+                                string $contentDescription = null,
                                 string $themePath = null)
     {
         $this->title = self::$defaultTitle." &ndash; ".$title;
         $this->heading = $title;
-        $this->description = self::$defaultDescription." ".$description;
+        $this->headingDescription = self::$defaultDescription." ".$headerDescription;
+        $this->content = $content;
+        $this->contentDescription = $contentDescription;
         $this->keywords = join(", ", self::$defaultKeywords + $keywords);
         $this->templatePath = $templatePath;
         if ($themePath != null)
@@ -88,7 +100,7 @@ class Page
         echo $mainScArea;*/
     }
     
-    private function GetNotFoundFormat($path)
+    private static function GetNotFoundFormat($path)
     {
         // Get the extension.
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -108,13 +120,7 @@ class Page
         }
     }
     
-    public function Asset(string $path)
-    {
-        echo $this->GetAsset($path);
-    }
-    
-
-    public function GetAsset(string $path)
+    public static function LibGetAsset(string $path)
     {
         $assetPath = "assets/".$path;
         if (!file_exists($assetPath))
@@ -129,11 +135,22 @@ class Page
             else
             {
                 // Not found anywhere.
-                $assetPath = "assets".DS."notfound.".$this->GetNotFoundFormat($path);
+                $assetPath = "assets".DS."notfound.".self::GetNotFoundFormat($path);
             }
         }
         
         return $assetPath;
+    }
+    
+    public function Asset(string $path)
+    {
+        echo $this->GetAsset($path);
+    }
+    
+
+    public function GetAsset(string $path)
+    {
+        return self::LibGetAsset($path);
     }
     
     public function ImgFromText(string $text, int $charSize, string $fontPath)
@@ -184,7 +201,7 @@ class Page
     
     public static function GetHomepageLink()
     {
-        
+        echo "/";
     }
     
     public static function GetLink(string $slug)

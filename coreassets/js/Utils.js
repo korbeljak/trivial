@@ -8,6 +8,10 @@ var Utils = new function()
     
     /**
      * Asserts - sends out a JS error onto the server for debugging.
+     * 
+     * This function produces POST data in form of:
+     * 
+     * name=<name>&message=<message>&description=<description>&stack=<stack>
      */
     this.Assert = function (ex)
     {

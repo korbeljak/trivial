@@ -29,18 +29,6 @@ function Validator_Validate(validationRules)
     }
     catch (ex)
     {
-        // TODO: Solve assertions via ajax & logging.
-        if (ex.description)
-        {
-            alert(ex.description);
-        }
-        else
-        {
-            alert(ex.stack);
-        }
-    }
-    finally
-    {
-        
+        Utils.Assert(ex);
     }
 }
