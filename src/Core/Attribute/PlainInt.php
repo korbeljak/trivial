@@ -6,19 +6,16 @@
  * @author Jakub Korbel, korbel.jak@gmail.com
  *
  */
-class PlainString implements \Core\Attribute
+class PlainInt implements \Core\Attribute
 {
     /** If the attribute is required */
     protected $required;
 
-    /** Minimum length in chars. */
+    /** Minimum value of the number. */
     protected $min;
 
-    /** Maximum length in chars. */
+    /** Maximum value of the number. */
     protected $max;
-
-    /** Regular expression to match the string against. */
-    protected $regexp;
 
     /** Hint for filling the attribute value. */
     protected $hint;
@@ -32,18 +29,21 @@ class PlainString implements \Core\Attribute
     /** Attribute state. */
     protected $state;
 
+    /** Default value */
+    protected $default;
+
     /**
      * Constructor.
      * 
      * @param string $name Identifier name.
      * @param bool $required Attribute is required (true) or not (false).
      * @param string $hint Hint for filling the attribute value.
-     * @param string $description Description of the attribute. 
-     * If empty, value from the hint will be used.
-     * @param string $default Default value of the attribute.
-     * @param int $max Maximum length in chars.
-     * @param int $min Minimum length in chars.
-     * @param string $regexp Regular expression to match the string against.
+     * @param string $description Description of the attribute.
+     * If empty, value from hint will be used instead.
+     * @param int $default Default value of the attribute - if unset, it is
+     * NULL.
+     * @param int $max Maximum value of the number.
+     * @param int $min Maximum value of the number.
      * 
      * @throws \InvalidArgumentException
      */
@@ -51,10 +51,9 @@ class PlainString implements \Core\Attribute
                                 bool $required,
                                 string $hint,
                                 string $description = "",
-                                string $default = NULL,
-                                int $min = 0,
-                                int $max = 255,
-                                string $regexp = "")
+                                int $default = NULL,
+                                int $min = PHP_INT_MIN,
+                                int $max = PHP_INT_MAX)
     {
         if (empty($name))
         {
@@ -75,7 +74,6 @@ class PlainString implements \Core\Attribute
         $this->required = $required;
         $this->max = $max;
         $this->min = $min;
-        $this->regexp = $regexp;
         $this->hint = $hint;
         $this->state = \Core\Attribute::STATE_UNKNOWN;
         $this->value = null;
@@ -123,7 +121,7 @@ class PlainString implements \Core\Attribute
     public function GetSqlColumn(string $template)
     {
         $fullName = $template . "_" . $this->name;
-        $sql = $fullName." VARCHAR(".$this->max.")";
+        $sql = $fullName." INTEGER";
         return $sql;
     }
 
@@ -143,8 +141,7 @@ class PlainString implements \Core\Attribute
                 "required" => $this->required,
                 "hint" => $this->hint,
                 "min" => $this->min,
-                "max" => $this->max,
-                "regexp" => $this->regexp));
+                "max" => $this->max));
 
         return json_encode($jsonArray, JSON_PRETTY_PRINT);
     }

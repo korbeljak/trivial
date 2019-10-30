@@ -35,7 +35,8 @@ class Date implements \Core\Attribute
      * @param string $name Identifier name.
      * @param bool $required Attribute is required (true) or not (false).
      * @param string $hint Hint for filling the attribute value.
-     * @param string $description Description of the attribute.
+     * @param string $description Description of the attribute. 
+     * If empty (default), value from $hint will be used.
      * @param string $default Default value of the attribute.
      * @param int $max Maximum length in chars.
      * @param int $min Minimum length in chars.
@@ -46,7 +47,7 @@ class Date implements \Core\Attribute
     public function __construct(string $name,
                                 bool $required,
                                 string $hint,
-                                string $description,
+                                string $description = "",
                                 string $default = "",
                                 \DateTime $min = null,
                                 \DateTime $max = null,
@@ -62,11 +63,16 @@ class Date implements \Core\Attribute
             throw new \InvalidArgumentException("Limits are invalid");
         }
 
+        if (empty($description) && !empty($hint))
+        {
+            $description = $hint;
+        }
+
         $this->name = $name;
         $this->required = $required;
         $this->max = $max;
         $this->min = $min;
-        $this->regexp = $regexp;
+        $this->regexp = null;
         $this->hint = $hint;
         $this->state = \Core\Attribute::STATE_UNKNOWN;
         $this->value = null;

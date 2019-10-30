@@ -269,7 +269,7 @@ class Router
             if (!$found)
             {
                 \Core\Logger::Log(LOG_ERR,
-                                  "Nonexistent controller for the route!",
+                                  "Nonexistent controller for the route '$argStr'!",
                                   \Core\Logger::O_SYSTEM_ALL);
             }
         }
