@@ -59,6 +59,28 @@ class Logger
     {
     }
     
+    public static function GetUserIpAddr()
+    {
+        $ip = "";
+        
+        if(!empty($_SERVER['HTTP_CLIENT_IP']))
+        {
+            //ip from share internet
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        }
+        elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+        {
+            //ip pass from proxy
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+        else
+        {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        
+        return $ip;
+    }
+    
     /**
      * Gets a Timestamp.
      * 
@@ -80,7 +102,7 @@ class Logger
                          string $message,
                          int $outputs)
     {
-        $msg = "[".$this->GetTimestamp()."] [".$this->lvlStrings[$level]."]"." ".$message."\n";
+        $msg = "[".$this->GetTimestamp()."] [".$this->lvlStrings[$level]."] [".self::GetUserIpAddr()."] ".$message."\n";
         
         if ($outputs & self::O_EMAIL)
         {
