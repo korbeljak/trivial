@@ -41,7 +41,8 @@ const ILVL = array("",                      //  0
 $found = \Core\Router::GetDefaultRouter()->Route($_GET["pg"]);
 if (!$found)
 {
-    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found"); 
+    header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+    echo "404 Not Found";
 }
 
 
