@@ -26,6 +26,9 @@ class Page
     /** Page Theme's template path. */
     protected $templatePath;
     
+    /** Page's properties. */
+    protected $properties;
+    
     public static $defaultTitle;
     public static $defaultDescription;
     public static $defaultKeywords = array();
@@ -58,6 +61,7 @@ class Page
      * @param string $content Page content.
      * @param string $contentDescription Page description beneath the content.
      * @param string $templatePath Page Theme's template path.
+     * @param array $properties Page's properties.
      */
     public function __construct(string $title,
                                 string $headerDescription,
@@ -65,14 +69,15 @@ class Page
                                 string $templatePath,
                                 string $content = null,
                                 string $contentDescription = null,
-                                string $themePath = null)
+                                string $themePath = null,
+                                array $properties = null)
     {
         $this->title = self::$defaultTitle." &ndash; ".$title;
         $this->heading = $title;
         $this->headingDescription = self::$defaultDescription." ".$headerDescription;
         $this->content = $content;
         $this->contentDescription = $contentDescription;
-        $this->keywords = join(", ", self::$defaultKeywords + $keywords);
+        $this->keywords = join(",", self::$defaultKeywords + $keywords);
         $this->templatePath = $templatePath;
         if ($themePath != null)
         {
@@ -81,6 +86,15 @@ class Page
         else
         {
             $this->themePath = self::$defaultThemePath;
+        }
+        
+        if ($properties != null)
+        {
+            $this->properties = $properties;
+        }
+        else
+        {
+            $this->properties = array();
         }
     }
     
@@ -197,6 +211,20 @@ class Page
             
             echo $assetName;
         }
+    }
+    
+    public function __get($name)
+    {
+        if (isset($this->name))
+        {
+            return $this->name;
+        }
+        if (isset($this->properties[$name]))
+        {
+            return $this->properties[$name];
+        }
+        
+        return null;
     }
     
     public static function GetHomepageLink()

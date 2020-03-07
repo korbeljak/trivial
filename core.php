@@ -38,6 +38,12 @@ const ILVL = array("",                      //  0
 // \Core\Router::GetDefaultRouter()->AddRule("/(?P<name>ahoj)\/(?P<whom>.+)\//", 'say_hi');
 // \Core\Router::GetDefaultRouter()->AddRule("/(?P<name>ahoj)\/(?P<whom>.+)\//", 'say_hello');
 \Core\Router::GetDefaultRouter()->AddRule("/coreassets\/(?P<assetPath>.+)/", '\Core\Asset::GetAsset');
+
+if (!is_string($_GET["pg"]))
+{
+    $_GET["pg"] = "";
+}
+
 $found = \Core\Router::GetDefaultRouter()->Route($_GET["pg"]);
 if (!$found)
 {
