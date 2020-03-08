@@ -6,7 +6,7 @@
  * Represents:
  *    1. A form.
  *    2. A DB entity.
- *    3. An PHP object.
+ *    3. A PHP object.
  * 
  * @author Jakub Korbel, korbel.jak@gmail.com
  *

@@ -1,8 +1,6 @@
 <?php
 
-include "Entity.php";
-
-class User implements Entity
+class User extends \Core\Entity
 {
     protected $id;
     
