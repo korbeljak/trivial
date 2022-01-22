@@ -270,7 +270,7 @@ class Router
             {
                 \Core\Logger::Log(LOG_ERR,
                                   "Nonexistent controller for the route '$argStr'!",
-                                  \Core\Logger::O_SYSTEM_ALL);
+                                  \Core\Logger::O_SYSLOG);
             }
         }
         
