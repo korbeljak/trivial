@@ -25,6 +25,8 @@ class Session
 {
     public $user;
     public $notifications = [];
+    protected static $redirect_url;
+    public $redirect_to;
 
     private int $login_time_s;
     private int $abs_tout_s;
@@ -40,7 +42,8 @@ class Session
     public function log_out()
     {
         $this->user = null;
-        redirect_hop_to();
+
+        self::redirect_hop_to("");
     }
 
     public function check_timer(): bool
@@ -152,6 +155,24 @@ class Session
         Session::session_check_timer();
         
         var_dump(Session::get_session());
+    }
+
+    public static function SetRedirectUrl(string $url="redirect/")
+    {
+        self::$redirect_url = $url;
+    }
+
+    public static function redirect_hop_to($path = null)
+    {
+        $session = self::get_session();
+        if ($session != null)
+        {
+            $session->redirect_to = $path == null ? "" : $path;
+        }
+
+        $header = "Location: ".Utils::get_absolute_path(self::$redirect_url);
+        header($header, true, 303);
+        die();
     }
 }
 
