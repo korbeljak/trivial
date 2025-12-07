@@ -39,12 +39,28 @@ const ILVL = array("",                      //  0
 // \Core\Router::GetDefaultRouter()->AddRule("/(?P<name>ahoj)\/(?P<whom>.+)\//", 'say_hello');
 \Core\Router::GetDefaultRouter()->AddRule("/coreassets\/(?P<assetPath>.+)/", '\Core\Asset::GetAsset');
 
+$url = "";
 if (!array_key_exists("pg", $_GET) || !is_string($_GET["pg"]))
 {
     $_GET["pg"] = "";
 }
+else
+{
+    $url = $_GET["pg"];
+}
 
-$found = \Core\Router::GetDefaultRouter()->Route($_GET["pg"]);
+if (!array_key_exists("url", $_GET) || !is_string($_GET["url"]))
+{
+    $_GET["url"] = "";
+}
+else
+{
+    $url = $_GET["url"];
+}
+
+\Core\Session::start();
+
+$found = \Core\Router::GetDefaultRouter()->Route($url);
 if (!$found)
 {
     header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");

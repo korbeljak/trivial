@@ -68,7 +68,7 @@ class RouteRule
      */
     public function __construct(string $regex, 
                                 callable $controller,
-                                array $additionalArgs = null,
+                                array|null $additionalArgs = null,
                                 int $priority = 0,
                                 int $order = 0,
                                 int $controllerType = self::CONTROLLER_USER)
@@ -218,7 +218,7 @@ class Router
      */
     public function AddRule(string $regex,
                             callable $controller,
-                            array $additionalArgs = null,
+                            array|null $additionalArgs = null,
                             int $priority = 0,
                             int $controllerType = self::CONTROLLER_USER)
     {

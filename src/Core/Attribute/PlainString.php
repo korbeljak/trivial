@@ -9,28 +9,34 @@
 class PlainString implements \Core\Attribute
 {
     /** If the attribute is required */
-    protected $required;
+    protected bool $required;
 
     /** Minimum length in chars. */
-    protected $min;
+    protected int $min;
 
     /** Maximum length in chars. */
-    protected $max;
+    protected int $max;
 
     /** Regular expression to match the string against. */
-    protected $regexp;
+    protected string $regexp;
 
     /** Hint for filling the attribute value. */
-    protected $hint;
+    protected string $hint;
     
     /** Description of the attribute. */
-    protected $description;
+    protected string $description;
     
     /** Attribute value. */
-    protected $value;
+    protected string|null $value;
     
     /** Attribute state. */
-    protected $state;
+    protected int $state;
+    
+    /** Attribute name. */
+    protected string $name;
+    
+    /** Attribute default. */
+    protected string|null $default;
 
     /**
      * Constructor.
@@ -51,7 +57,7 @@ class PlainString implements \Core\Attribute
                                 bool $required,
                                 string $hint,
                                 string $description = "",
-                                string $default = NULL,
+                                string|null $default = NULL,
                                 int $min = 0,
                                 int $max = 255,
                                 string $regexp = "")

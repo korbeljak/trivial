@@ -9,7 +9,7 @@ class Page
     protected $heading;
     
     /** Page Description in the heading. */
-    protected $headerDescription;
+    protected $headingDescription;
     
     /** Page Description in the content. */
     protected $contentDescription;
@@ -67,10 +67,10 @@ class Page
                                 string $headerDescription,
                                 array $keywords,
                                 string $templatePath,
-                                string $content = null,
-                                string $contentDescription = null,
-                                string $themePath = null,
-                                array $properties = null)
+                                string|null $content = null,
+                                string|null $contentDescription = null,
+                                string|null $themePath = null,
+                                array|null $properties = null)
     {
         $this->title = self::$defaultTitle." &ndash; ".$title;
         $this->heading = $title;
@@ -97,9 +97,19 @@ class Page
             $this->properties = array();
         }
     }
-    
-    public function Render()
+
+    public function set_property(string $name, $value)
     {
+        $this->properties[$name] = $value;
+    }
+    
+    public function Render(bool $extract_plain=false)
+    {
+        if ($extract_plain)
+        {
+            extract($this->properties);
+        }
+
         include $this->themePath.DS.$this->templatePath.".php";
     }
     
