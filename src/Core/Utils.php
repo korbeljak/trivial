@@ -4,7 +4,7 @@ class Utils
 {
 
 public static function get_web_root(){
-    return "http://".$_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"];
+    return $_SERVER['REQUEST_SCHEME']."://".$_SERVER["SERVER_NAME"];
 }
 
 public static function format_date_czech($a = "now", $milis = false)
@@ -34,10 +34,7 @@ public static function redirect_now($relativni_adresa = FALSE){
 
     public function current_url(): string
     {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-              ? 'https'
-              : 'http';
-
+        $scheme = $_SERVER['REQUEST_SCHEME'];
         $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
         $uri  = $_SERVER['REQUEST_URI'] ?? '/';
 
