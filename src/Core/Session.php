@@ -154,7 +154,7 @@ class Session
         Session::get_or_create_session();
         Session::session_check_timer();
         
-        var_dump(Session::get_session());
+        // var_dump(Session::get_session());
     }
 
     public static function SetRedirectUrl(string $url="redirect/")
