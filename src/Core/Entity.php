@@ -76,6 +76,8 @@ class Entity
         {
             $formHtml .= ILVL[$lvl+1].$attr->GetHtmlFormElem("form_".$this->name)."\n";
         }
+
+        $formHtml .= ILVL[$lvl].'<input type="hidden" name="xsrf_token" value="'.\Core\Session::issue_xsrf().'">';
         
         $formHtml .= ILVL[$lvl]."</form>";
         

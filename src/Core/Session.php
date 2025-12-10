@@ -27,10 +27,13 @@ class Session
     public $notifications = [];
     protected static $redirect_url;
     public $redirect_to;
+    protected $xsrf = [];
 
     private int $login_time_s;
     private int $abs_tout_s;
-    const MAX_IDLE_S = 1800;
+    const MAX_IDLE_S = 3600;
+    const MAX_TOKEN_VALIDITY_S = 2400;
+    const TOKENS_MAX = 10;
 
     public function __construct($user = null)
     {
@@ -118,7 +121,7 @@ class Session
     public static function is_member(): bool
     {
         $user = self::get_user();
-        return ($user != null) && !$user->anonymous;
+        return ($user != null) && !$user->is_anonymous();
     }
 
     public static function session_log_out(): bool
@@ -153,8 +156,57 @@ class Session
         session_start();
         Session::get_or_create_session();
         Session::session_check_timer();
-        
-        // var_dump(Session::get_session());
+    }
+
+    public static function issue_xsrf(): string
+    {
+        $xsrf_token = "";
+        $session = self::get_session();
+        if ($session != null)
+        {
+            if (count($session->xsrf) > self::TOKENS_MAX)
+            {
+                asort($session->xsrf); // keeps assoc keys
+                
+                $to_remove_cnt = $count - self::TOKENS_MAX;
+                $keys_to_remove = array_slice(array_keys($session->xsrf), 0, $to_remove_cnt);
+
+                foreach ($keys_to_remove as $key)
+                {
+                    unset($session->xsrf[$key]);
+                }
+            }
+
+            $xsrf_token = bin2hex(random_bytes(32));
+            $session->xsrf[$xsrf_token] = time();
+        }
+
+        return $xsrf_token;
+    }
+
+    public static function validate_xsrf($xsrf_token)
+    {
+        $ok = false;
+        $session = self::get_session();
+        if ($session != null)
+        {
+            $now = time();
+            foreach ($session->xsrf as $xsrf => $time)
+            {
+                if ($now - $time > self::MAX_TOKEN_VALIDITY_S)
+                {
+                    unset($session->xsrf[$xsrf]);
+                }
+            }
+
+            if (isset($session->xsrf[$xsrf_token]))
+            {
+                unset($session->xsrf[$xsrf_token]);
+                $ok = true;
+            }
+        }
+
+        return $ok;
     }
 
     public static function SetRedirectUrl(string $url="redirect/")
