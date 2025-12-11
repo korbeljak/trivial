@@ -27,6 +27,7 @@ class Session
     public $notifications = [];
     protected static $redirect_url;
     public $redirect_to;
+    public $redirect_wait_s;
     protected $xsrf = [];
 
     private int $login_time_s;
@@ -124,6 +125,12 @@ class Session
         return ($user != null) && !$user->is_anonymous();
     }
 
+    public static function is_admin(): bool
+    {
+        $user = self::get_user();
+        return ($user != null) && $user->is_admin();
+    }
+
     public static function session_log_out(): bool
     {
         $session = self::get_session();
@@ -214,12 +221,13 @@ class Session
         self::$redirect_url = $url;
     }
 
-    public static function redirect_hop_to($path = null)
+    public static function redirect_hop_to($path = null, $wait_s=0)
     {
         $session = self::get_session();
         if ($session != null)
         {
             $session->redirect_to = $path == null ? "" : $path;
+            $session->redirect_wait_s = $wait_s;
         }
 
         $header = "Location: ".Utils::get_absolute_path(self::$redirect_url);

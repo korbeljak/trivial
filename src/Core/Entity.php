@@ -232,7 +232,6 @@ class Entity
      */
     public function __set(string $name, $value)
     {
-        // var_dump($name);
         
         if (array_key_exists($name, $this->attr))
         {

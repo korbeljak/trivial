@@ -3,17 +3,6 @@ use Core\Router;
 
 const CORE_PATH =__DIR__;
 
-// function say_hi($args)
-// {
-//     var_dump($args);
-//     echo "HI, $args[whom]!";
-// }
-// function say_hello($args)
-// {
-//     var_dump($args);
-//     echo "HELLO, $args[whom]!";
-// }
-
 
 /**
  * @var array ILVL Indentation level.
