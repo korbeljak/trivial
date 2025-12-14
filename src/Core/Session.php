@@ -21,6 +21,26 @@ class Notification
     }
 }
 
+class RememberMe
+{
+    protected int $user_id;
+    protected string $selector;
+    protected string $validator_hash;
+    protected \DateTime $expiration;
+
+    public static function create_table($db)
+    {
+        $q = "CREATE TABLE remember_me (
+                id SERIAL PRIMARY KEY,
+                user_id INT NOT NULL,
+                selector INT NOT NULL,
+                validator_hash TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                expiration TIMESTAMPTZ
+            );";
+        $db->run($q);
+    }
+}
+
 class Session
 {
     public $user;
@@ -160,6 +180,15 @@ class Session
 
     public static function start()
     {
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        ini_set('session.use_strict_mode', '1');
         session_start();
         Session::get_or_create_session();
         Session::session_check_timer();

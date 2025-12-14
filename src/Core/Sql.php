@@ -7,123 +7,46 @@ class Sql
     private $connstr;  
     private $conn;    
     private $chyby;
-    public $schema;
+    public string $schema;
+    private string $dsn;
 
-    public function __construct($host, $db, $user, $pass, $port, $schema=""){
+    public function __construct(string $db,
+                                string $user,
+                                string $pass,
+                                string $socket_dir = "/var/run/postgresql",
+                                $schema=""){
         $this->schema = $schema;
-        if ($host === null)
-        {
-            $connstr = "dbname=".$db." user=".$user." password=".$pass;
-        }
-        else
-        {
-
-            $connstr = "host=".$host." dbname=".$db." user=".$user." password=".$pass;
-            if ($port != null)
-            {
-                $connstr .= " port=".$port;
-            }
-        }
-
-        $this->connstr = $connstr;
-        $this->_connect();
-        $this->print_errors("spojeni");
+        $this->dsn = "pgsql:host={$socket_dir};dbname={$db}";
+        $this->pdo = new \PDO($this->dsn, $user, $pass);
     }
     
-    private function _connect()
-    {
-        $this->conn = pg_connect($this->connstr);
-        if(!$this->conn)
-        {
-            $this->chyby['spojeni'][] = "spojení z databázovým serverem selhalo";
-        }
-    }
     
-    public function query($query)
+    public function run($query_str, $params = [])
     {
-        $vysledek = @pg_query($this->conn, $query);
-        if (!$vysledek)
-        {
-            $this->chyby['dotazy'][] = "Dotaz selhal: ".pg_last_error($this->conn);
-        }
-
-        return $vysledek;
-    }
-    
-    private function _get_one_item($vysledek_dotazu)
-    {
-        $vysledek = pg_fetch_assoc($vysledek_dotazu);
-        if(!$vysledek){
-           $this->chyby['dotazy'][] = "Získání pole selhalo: ".pg_last_error($this->conn);
-        }
-        return $vysledek;
-    }
-    
-    public function get_query_one($query)
-    {
-        $one = null;
-        $query_result = $this->query($query);
-        if ($query_result)
-        {
-            $one = pg_fetch_assoc($query_result);
-            
-            if (!$one)
-            {
-                $this->chyby['dotazy'][] = "Získání pole selhalo: ".pg_last_error($this->conn);
-            }
-        }
-
-        return $one;
+        $stmt = $this->pdo->prepare($query_str);
+        $stmt->execute($params);
+        return $stmt;
     }
 
-    public function get_query_map($query)
+    public function get_query_one($query_str, $params = [])
     {
-        $out_array = array();
-        $query_result = pg_query($this->conn, $query);
-        if (!$query_result)
-        {
-            $this->chyby['dotazy'][] = "Dotaz selhal: ".pg_last_error($this->conn);
-        }
+        $row = $this->run($query_str, $params)->fetch(\PDO::FETCH_ASSOC);
+        return $row === false ? null : $row;
+    }
 
-        while ($one = $this->_get_one_item($query_result))
-        {
-            array_push($out_array, $one);
-        }
-
-        return $out_array;
+    public function get_query_map($query_st, $params = [])
+    {
+        return $this->run($query_str, $params)->fetchAll(\PDO::FETCH_ASSOC);
     }
     
     public function get_row_cnt($query_result)
     {
-        return @pg_num_rows($query_result);
-    }
-    
-    public function disconnect()
-    {
-        return pg_close($this->conn);
-    }
-    
-    public function print_errors($oddil = "dotazy")
-    {
-        if(!empty($this->chyby[$oddil])){
-            $ret = "";
-            foreach ($this->chyby[$oddil] as $chyba){
-                $ret .= $chyba.$this->oddelovac;
-            }
-            return $ret;
-        }
-        else return FALSE;
+        return $query_result.rowCount();
     }
 
-    public function __destruct()
+    public static function Configure($db, $user, $pass, $schema="")
     {
-        $this->disconnect();
-    }
-
-
-    public static function Configure($host, $db, $user, $pass, $port, $schema="")
-    {
-        self::$sql = new \Core\Sql($host, $db, $user, $pass, $port, $schema);
+        self::$sql = new \Core\Sql($db, $user, $pass, $schema);
     }
 
     /**
