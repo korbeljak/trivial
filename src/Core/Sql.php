@@ -23,19 +23,36 @@ class Sql
     public function run($query_str, $params = [])
     {
         $stmt = $this->pdo->prepare($query_str);
-        $stmt->execute($params);
-        return $stmt;
+        if ($stmt)
+        {
+            if ($stmt->execute($params))
+            {
+                return $stmt;
+            }
+        }
+        return null;
     }
 
     public function get_one($query_str, $params = [])
     {
-        $row = $this->run($query_str, $params)->fetch(\PDO::FETCH_ASSOC);
-        return $row === false ? null : $row;
+        $stmt = $this->run($query_str, $params);
+        if ($stmt)
+        {
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        }
+        return $stmt === false ? null : $row;
     }
 
     public function get_map($query_str, $params = [])
     {
-        return $this->run($query_str, $params)->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->run($query_str, $params);
+        if ($stmt)
+        {
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        }
+        return $stmt === false ? null : $rows;
     }
     
     public function get_cnt($query_result)

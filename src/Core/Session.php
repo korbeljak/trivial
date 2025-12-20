@@ -31,35 +31,105 @@ class RememberMe
     private const int SELECTOR_LEN = 16;
     private const int VALIDATOR_LEN = 32;
     private const int VALIDITY_DAYS = 30;
-    private const int DAY_TO_SEC = 60*60*24;
+    private const string HASH = "sha256";
+
+    public static function forget($db, int $user_id)
+    {
+        $q = "DELETE FROM remember_me WHERE user_id=:user_id;";
+        $db->run($q, ["user_id" => $user_id]);
+
+        self::delete_cookie();
+
+    }
+
+    public static function delete_cookie()
+    {
+        setcookie('__Host-remember_me', '', [
+            'expires'  => time() - 3600,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => true,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+    }
+
 
     public static function issue($db, int $user_id)
     {
         $q = "INSERT INTO remember_me (user_id, selector, validator_hash, expiration)
         VALUES (:user_id, :selector, :validator_hash, :expiration);";
 
-        $selector = b64url_encode(random_bytes(self::SELECTOR_LEN));
-        $validator = b64url_encode(random_bytes(self::VALIDATOR_LEN));
-        $validator_hash = password_hash($validator, PASSWORD_DEFAULT);
+        $selector = base64_encode(random_bytes(self::SELECTOR_LEN));
+        $validator = base64_encode(random_bytes(self::VALIDATOR_LEN));
+        $validator_hash = hash(self::HASH, $validator);
+        $validator_hash_str = self::HASH.":".$validator_hash;
 
         $cookie_val = "$selector:$validator";
 
-        $valid_for = self::VALIDITY_DAYS * self::DAY_TO_SEC;
-        $expiration = time() + $valid_for;
+        $expiration = new \DateTime();
+        $expiration->modify('+'.self::VALIDITY_DAYS.' days');
+
+        $expiration_str = $expiration->format("c");
 
         $db->run($q, ["user_id" => $user_id,
                       "selector" => $selector,
-                      "validator_hash" => $validator_hash,
-                      "expiration" => $expiration]);
+                      "validator_hash" => $validator_hash_str,
+                      "expiration" => $expiration_str]);
         
 
         setcookie('__Host-remember_me', $cookie_val, [
-            'expires'  => $expiration,
-            'path'     => '/',      // required for __Host-
-            'secure'   => true,     // required for __Host-
+            'expires'  => $expiration->getTimestamp(),
+            'path'     => '/',
+            'secure'   => true,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
+
+    }
+
+    public static function check($db)
+    {
+        $ok = false;
+        try
+        {
+            [$selector, $validator] = explode(":", $_COOKIE['__Host-remember_me']);
+            $ok = true;
+        }
+        catch (Throwable $t){}
+
+        if ($ok)
+        {
+            self::delete_cookie();
+
+            $q = "SELECT id, user_id, validator_hash, expiration FROM remember_me
+            WHERE selector=:selector AND expiration > NOW() LIMIT 1;";
+
+            $result = $db->get_one($q, ["selector" => $selector]);
+            if ($result)
+            {
+                $ok = false;
+                try
+                {
+                    [$algo, $hash_str] = explode(":", $result["validator_hash"]);
+                    $ok = true;
+                }
+                catch (Throwable $t){}
+
+                $q = "DELETE FROM remember_me WHERE id=:id;";
+                $db->run($q, ["id" => $result["id"]]);
+
+                if ($ok && hash($algo, $validator) == $hash_str)
+                {
+                    if (\Core\Session::$get_user_by_id != null)
+                    {
+                        $user = (\Core\Session::$get_user_by_id)($db, $result["user_id"]);
+                        \Core\Session::session_log_in($user);
+                    }
+                }
+            }
+        }
 
     }
 
@@ -84,6 +154,7 @@ class Session
     public $redirect_to;
     public $redirect_wait_s;
     protected $xsrf = [];
+    public static ?\Closure $get_user_by_id = null;
 
     private int $login_time_s;
     private int $abs_tout_s;
@@ -100,6 +171,7 @@ class Session
 
     public function log_out()
     {
+        RememberMe::forget(\Core\Sql::get(), $this->user->id);
         $this->user = null;
 
         self::redirect_hop_to("");
@@ -140,6 +212,11 @@ class Session
         if (self::get_session() == null)
         {
             $_SESSION['session'] = new Session();
+
+            if (isset($_COOKIE['__Host-remember_me']))
+            {
+                \Core\RememberMe::check(\Core\Sql::get());
+            }
         }
         return $_SESSION['session'];
     }
@@ -152,6 +229,8 @@ class Session
             $session->user = $user;
             $session->login_time_s = time();
             $session->abs_tout_s =  $session->login_time_s + self::MAX_IDLE_S;
+
+            \Core\RememberMe::issue(\Core\Sql::get(), $user->id);
         }
     }
 
@@ -283,6 +362,11 @@ class Session
     public static function SetRedirectUrl(string $url="redirect/")
     {
         self::$redirect_url = $url;
+    }
+
+    public static function SetGetUserById(callable $get_user_by_id)
+    {
+        self::$get_user_by_id = \Closure::fromCallable($get_user_by_id);
     }
 
     public static function redirect_hop_to($path = null, $wait_s=0)
