@@ -28,13 +28,48 @@ class RememberMe
     protected string $validator_hash;
     protected \DateTime $expiration;
 
+    private const int SELECTOR_LEN = 16;
+    private const int VALIDATOR_LEN = 32;
+    private const int VALIDITY_DAYS = 30;
+    private const int DAY_TO_SEC = 60*60*24;
+
+    public static function issue($db, int $user_id)
+    {
+        $q = "INSERT INTO remember_me (user_id, selector, validator_hash, expiration)
+        VALUES (:user_id, :selector, :validator_hash, :expiration);";
+
+        $selector = b64url_encode(random_bytes(self::SELECTOR_LEN));
+        $validator = b64url_encode(random_bytes(self::VALIDATOR_LEN));
+        $validator_hash = password_hash($validator, PASSWORD_DEFAULT);
+
+        $cookie_val = "$selector:$validator";
+
+        $valid_for = self::VALIDITY_DAYS * self::DAY_TO_SEC;
+        $expiration = time() + $valid_for;
+
+        $db->run($q, ["user_id" => $user_id,
+                      "selector" => $selector,
+                      "validator_hash" => $validator_hash,
+                      "expiration" => $expiration]);
+        
+
+        setcookie('__Host-remember_me', $cookie_val, [
+            'expires'  => $expiration,
+            'path'     => '/',      // required for __Host-
+            'secure'   => true,     // required for __Host-
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+    }
+
     public static function create_table($db)
     {
         $q = "CREATE TABLE remember_me (
                 id SERIAL PRIMARY KEY,
                 user_id INT NOT NULL,
-                selector INT NOT NULL,
-                validator_hash TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                selector TEXT NOT NULL,
+                validator_hash TEXT NOT NULL,
                 expiration TIMESTAMPTZ
             );";
         $db->run($q);
